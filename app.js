@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const errorController = require('./controllers/error');
-//const User = require('./models/user');
+const User = require('./models/user');
 
 const app = express();
 
@@ -14,29 +14,41 @@ app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-/* app.use((req, res, next) => {
-  User.findById('5baa2528563f16379fc8a610')
+app.use((req, res, next) => {
+  User.findById('62c2794f5a57653f448a8da9')
     .then(user => {
-      req.user = new User(user.name, user.email, user.cart, user._id);
+      req.user=user;
       next();
     })
     .catch(err => console.log(err));
-}); */
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
+
 
 app.use(errorController.get404);
 
 mongoose
   .connect(
-    'mongodb+srv://sayyadmongo:m0vMwgXlNTRV0YcI@cluster0.uaiff.mongodb.net/mongoose_test?retryWrites=true&w=majority'
+    'mongodb+srv://sayyadmongo:m0vMwgXlNTRV0YcI@cluster0.uaiff.mongodb.net/mongoose_test?retryWrites=true&w=majority',
+    {useNewUrlParser: true, useUnifiedTopology: true}
   )
   .then(result => {
+    /* const user = new User({
+      name:'Khadar',
+      email:'khadar@gmail.com',
+      cart:{
+        items:[]
+      }
+    });
+    user.save(); */
     app.listen(3000);
   })
   .catch(err => {
