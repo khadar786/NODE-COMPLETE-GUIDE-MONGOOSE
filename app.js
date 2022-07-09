@@ -3,11 +3,18 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const session=require('express-session');
+const MongodbStore=require('connect-mongodb-session')(session);
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
+const MONGODB_URI='mongodb+srv://sayyadmongo:m0vMwgXlNTRV0YcI@cluster0.uaiff.mongodb.net/mongoose_test?retryWrites=true&w=majority';
 const app = express();
+const store=new MongodbStore({
+  uri:MONGODB_URI,
+  collection:'sessions'
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -18,7 +25,7 @@ const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(session({secret:'my secret',resave:false,saveUninitialized:false,store:store}));
 app.use((req, res, next) => {
   User.findById('62c2794f5a57653f448a8da9')
     .then(user => {
@@ -36,8 +43,7 @@ app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
-  .connect(
-    'mongodb+srv://sayyadmongo:m0vMwgXlNTRV0YcI@cluster0.uaiff.mongodb.net/mongoose_test?retryWrites=true&w=majority',
+  .connect(MONGODB_URI,
     {useNewUrlParser: true, useUnifiedTopology: true}
   )
   .then(result => {
