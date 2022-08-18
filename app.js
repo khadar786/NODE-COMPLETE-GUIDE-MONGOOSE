@@ -25,11 +25,16 @@ const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({secret:'my secret',resave:false,saveUninitialized:false,store:store}));
+app.use(session({secret:'my secret',resave:false,saveUninitialized:true,store:store}));
+
 app.use((req, res, next) => {
-  User.findById('62c2794f5a57653f448a8da9')
+  /* if(!req.session.user){
+    return next();
+  } */
+    User.findById('62f540e7df0bab2d90df4702')
     .then(user => {
-      req.user=user;
+      //console.log(user);
+      req.user = user;
       next();
     })
     .catch(err => console.log(err));
@@ -55,6 +60,18 @@ mongoose
       }
     });
     user.save(); */
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Khadar',
+          email: 'khadar@gmail.com',
+          cart: {
+            items: []
+          }
+        });
+        user.save();
+      }
+    });
     app.listen(3000);
   })
   .catch(err => {

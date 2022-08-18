@@ -24,6 +24,7 @@ userSchema.methods.addToCart=function(product){
     const cartProductIndex = this.cart.items.findIndex(cp => {
       return cp.productId.toString() === product._id.toString();
     });
+    
     let newQuantity = 1;
     const updatedCartItems = [...this.cart.items];
 
@@ -41,7 +42,7 @@ userSchema.methods.addToCart=function(product){
     };
     
     this.cart=updatedCart;
-    return this.save();
+    return this.save(); 
 }
 
 userSchema.methods.deleteItemFromCart=function(productId){
